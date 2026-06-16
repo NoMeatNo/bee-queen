@@ -1,0 +1,41 @@
+#EXTM3U
+#EXTINF:-1 tvg-name="UK: ITV 1 HEVC HD" group-title="ITV 1",(Server 7 RO) UK: ITV 1 HEVC HD
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://204.52.191.254:80/c/
+http://204.52.191.254:80/play/live.php?mac=00:1A:79:B5:85:B2&stream=&extension=ts&play_token=4f9PUiyDwr&sn2=|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2F204.52.191.254%3A80/c/
+#EXTINF:-1 tvg-name="UK: ITV 1 HEVC 4K" group-title="ITV 1",(Server 7 RO) UK: ITV 1 HEVC 4K
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://204.52.191.254:80/c/
+http://204.52.191.254:80/play/live.php?mac=00:1A:79:B5:85:B2&stream=&extension=ts&play_token=Rd3LosJDfU&sn2=|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2F204.52.191.254%3A80/c/
+#EXTINF:-1 tvg-name="UK| ITV 1 HEVC" group-title="ITV 1",(Server 5 RO) UK| ITV 1 HEVC
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://mag.trexlive.me:8000/c/
+http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:B5:D0:90&stream=&extension=ts&play_token=VnlY6J9QYw|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fmag.trexlive.me%3A8000/c/
+#EXTINF:-1 tvg-name="UK| ITV1 HEVC FHD" group-title="ITV1",(Server 5 RO) UK| ITV1 HEVC FHD
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://mag.trexlive.me:8000/c/
+http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:B5:D0:90&stream=&extension=ts&play_token=xncVFRDvRo|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fmag.trexlive.me%3A8000/c/
+#EXTINF:-1 tvg-name="UK| ITV1 HEVC HD" group-title="ITV1",(Server 5 RO) UK| ITV1 HEVC HD
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://mag.trexlive.me:8000/c/
+http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:B5:D0:90&stream=&extension=ts&play_token=0FpmaEQNBS|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fmag.trexlive.me%3A8000/c/
+#EXTINF:-1 tvg-name="UK| ITV1 HEVC FHD" group-title="ITV1",(Server 8 RO) UK| ITV1 HEVC FHD
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://sport-birutv.my.id:80/c/
+http://sport-birutv.my.id:80/play/live.php?mac=00:1A:79:CC:6B:4E&stream=&extension=ts&play_token=SKnc90xq6F|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fsport-birutv.my.id%3A80/c/
+#EXTINF:-1 tvg-name="┃UK┃ ITV 1 HEVC HD" group-title="ITV 1",(Server 2 RO) ┃UK┃ ITV 1 HEVC HD
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://line.cloud-ott.net:80/c/
+http://line.cloud-ott.net:80/play/live.php?mac=00:1A:79:BF:D2:70&stream=&extension=ts&play_token=ey4ebU25fj|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fline.cloud-ott.net%3A80/c/
+#EXTINF:-1 tvg-name="UK| ITV 1 HEVC" group-title="ITV 1",(Server 8 RO) UK| ITV 1 HEVC
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://sport-birutv.my.id:80/c/
+http://sport-birutv.my.id:80/play/live.php?mac=00:1A:79:CC:6B:4E&stream=&extension=ts&play_token=GWgcJZkA7z|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fsport-birutv.my.id%3A80/c/
+#EXTINF:-1 tvg-name="┃UK┃ ITV 1 HEVC FHD" group-title="ITV 1",(Server 2 RO) ┃UK┃ ITV 1 HEVC FHD
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://line.cloud-ott.net:80/c/
+http://line.cloud-ott.net:80/play/live.php?mac=00:1A:79:BF:D2:70&stream=&extension=ts&play_token=Rt7ZScZyYr|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fline.cloud-ott.net%3A80/c/
+#EXTINF:-1 tvg-name="UK| ITV1 HEVC HD" group-title="ITV1",(Server 8 RO) UK| ITV1 HEVC HD
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://sport-birutv.my.id:80/c/
+http://sport-birutv.my.id:80/play/live.php?mac=00:1A:79:CC:6B:4E&stream=&extension=ts&play_token=jM03Pjbqmj|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fsport-birutv.my.id%3A80/c/
