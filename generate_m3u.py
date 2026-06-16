@@ -9,17 +9,17 @@ import sys
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Test target channel
+# Target channel
 TARGET_CHANNELS = ["ITV 1", "ITV1"]
 
-# Quality filtering: If set to a string (e.g. "HEVC", "FHD", "HD"), it will only keep channels
-# whose names contain that string (case-insensitive). If set to "" or None, it extracts all matches.
+# Quality filtering
 QUALITY_FILTER = "hevc"
 
 # Handshake timeout and attempts config
 HANDSHAKE_TIMEOUT = 3.0
 FETCH_TIMEOUT = 5.0
 MAX_MAC_ATTEMPTS = 5
+USER_AGENT = "Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3"
 
 def load_servers_config():
     with open("./matrix/plugin.video.hublive/servers.json", "r") as f:
@@ -36,7 +36,7 @@ def build_auth_headers_and_cookies(portal_url, mac, token, random_value="0"):
     mac_upper = (mac or "").strip().upper()
     identity = build_device_identity(mac_upper)
     headers = {
-        "User-Agent": "Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3",
+        "User-Agent": USER_AGENT,
         "Accept": "*/*",
         "X-User-Agent": "Model: MAG250; Link:",
         "Referer": f"{portal_url}/c/",
@@ -83,14 +83,34 @@ def fetch_channels(portal_url, mac, token, random_value):
         print(f"Error fetching channels for {portal_url}: {e}")
     return []
 
+def _extract_play_token(returned_cmd):
+    play_token_match = re.search(r"play_token=([a-zA-Z0-9]+)", returned_cmd or "")
+    if play_token_match:
+        return play_token_match.group(1)
+    return None
+
 def get_channel_link(ch):
     headers, cookies = build_auth_headers_and_cookies(ch["portal"], ch["mac"], ch["token"], ch["random"])
-    url = f"{ch['portal']}/server/load.php?type=itv&action=create_link&cmd={quote_plus(ch['cmd'])}"
+
+    # Try the same strategy the Kodi addon uses
+    create_link_url = f"{ch['portal']}/portal.php?type=itv&action=create_link&cmd={quote_plus(ch['cmd'])}&JsHttpRequest=1-xml"
     try:
-        response = requests.get(url, headers=headers, cookies=cookies, timeout=FETCH_TIMEOUT, verify=False)
+        response = requests.get(create_link_url, headers=headers, cookies=cookies, timeout=FETCH_TIMEOUT, verify=False)
         data = response.json()
         if "js" in data and isinstance(data["js"], dict) and "cmd" in data["js"]:
-            return ch, data["js"]["cmd"]
+            returned_cmd = data["js"]["cmd"]
+
+            # If server returned ffmpeg standard stream line, return it
+            if returned_cmd and returned_cmd.startswith("ffmpeg "):
+                return ch, returned_cmd
+
+            # Otherwise extract play_token to build the direct live.php link like Kodi does
+            play_token = _extract_play_token(returned_cmd)
+            if play_token:
+                stream_id_match = re.search(r"(\d+)", ch["cmd"])
+                stream_id = stream_id_match.group(1) if stream_id_match else ch["cmd"]
+                final_url = f"{ch['portal'].rstrip('/')}/play/live.php?mac={ch['mac']}&stream={stream_id}&extension=ts&play_token={play_token}"
+                return ch, final_url
     except Exception:
         pass
     return ch, None
@@ -111,16 +131,12 @@ def process_server(server):
     if not portal_url:
         return []
 
-    print(f"--- Checking {server_name} ({portal_url}) ---")
     token = None
     random_value = None
     working_mac = None
 
-    attempts = 0
-    # Process MACs concurrently for faster handshake
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-        macs_to_test = server.get("macs", [])[:MAX_MAC_ATTEMPTS] # Test up to N MACs to avoid hanging on dead servers
-
+        macs_to_test = server.get("macs", [])[:MAX_MAC_ATTEMPTS]
         future_to_mac = {executor.submit(handshake, portal_url, mac): mac for mac in macs_to_test}
         for future in concurrent.futures.as_completed(future_to_mac):
             mac = future_to_mac[future]
@@ -130,30 +146,22 @@ def process_server(server):
                     token = t
                     random_value = r
                     working_mac = mac
-                    # Cancel other futures if possible by stopping the loop, but we can't cleanly abort others easily
-                    # We just take the first working one
                     break
             except Exception:
                 pass
 
     if not token:
-        print(f"No working MAC found for {portal_url} (checked {len(macs_to_test)} macs)")
         return []
 
-    print(f"Fetching channels for {portal_url}...")
     channels = fetch_channels(portal_url, working_mac, token, random_value)
-    print(f"Found {len(channels)} channels on {server_name}.")
 
     server_channels = []
     for ch in channels:
         ch_name = ch.get("name", "")
-
-        # Apply quality filter before heavy matching
         if not filter_by_quality(ch_name, QUALITY_FILTER):
             continue
 
         ch_norm = normalize_name(ch_name)
-
         for target in TARGET_CHANNELS:
             target_norm = normalize_name(target)
             if target_norm in ch_norm:
@@ -176,21 +184,14 @@ def main():
     config = load_servers_config()
     all_channels_found = []
 
-    print(f"Discovering channels across all servers (Quality Filter: '{QUALITY_FILTER}')...")
-
-    # Run the server processing in parallel
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         future_to_server = {executor.submit(process_server, server): server for server in config.get("servers", [])}
         for future in concurrent.futures.as_completed(future_to_server):
-            server_channels = future.result()
-            all_channels_found.extend(server_channels)
+            all_channels_found.extend(future.result())
 
     if not all_channels_found:
-        print("No matching channels found.")
         sys.exit(0)
 
-    # Parallel resolve links
-    print(f"\nResolving links for {len(all_channels_found)} channels in parallel...")
     resolved_channels = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         future_to_ch = {executor.submit(get_channel_link, ch): ch for ch in all_channels_found}
@@ -199,24 +200,26 @@ def main():
             if link:
                 ch["resolved_link"] = link
                 resolved_channels.append(ch)
-                print(f"Resolved: ({ch['server_name']}) {ch['name']}")
-            else:
-                print(f"Failed to resolve link for: {ch['name']}")
 
-    # Write M3U
-    print(f"\nGenerating M3U file with {len(resolved_channels)} channels...")
     with open("hublive.m3u", "w", encoding="utf-8") as f:
         f.write("#EXTM3U\n")
         for ch in resolved_channels:
             link = ch["resolved_link"]
-            # Resolve link if it starts with ffmpeg or http
             if link.startswith("ffmpeg "):
                 link = link.split(" ")[1]
-            formatted_name = f'({ch["server_name"]}) {ch["name"]}'
-            f.write(f'#EXTINF:-1 tvg-name="{ch["name"]}" group-title="{ch["target"]}",{formatted_name}\n')
-            f.write(f'{link}\n')
 
-    print("\nDone! M3U saved to hublive.m3u")
+            # Formulate full URL with Kodi/VLC standard User-Agent header pipe
+            full_link = f"{link}|User-Agent={quote_plus(USER_AGENT)}&Referer={quote_plus(ch['portal'])}/c/"
+
+            formatted_name = f'({ch["server_name"]}) {ch["name"]}'
+
+            f.write(f'#EXTINF:-1 tvg-name="{ch["name"]}" group-title="{ch["target"]}",{formatted_name}\n')
+
+            # For standard VLC/IPTV players, provide the raw HTTP VLC OPT options so it sets HTTP headers
+            f.write(f'#EXTVLCOPT:http-user-agent={USER_AGENT}\n')
+            f.write(f'#EXTVLCOPT:http-referrer={ch["portal"]}/c/\n')
+
+            f.write(f'{full_link}\n')
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(line_buffering=True)

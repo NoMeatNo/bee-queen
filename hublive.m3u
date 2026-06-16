@@ -1,17 +1,21 @@
 #EXTM3U
-#EXTINF:-1 tvg-name="UK| ITV 1 HEVC" group-title="ITV 1",(Server 8 RO) UK| ITV 1 HEVC
-http://sport-birutv.my.id:80/play/live.php?mac=00:1A:79:6E:5C:0E&stream=&extension=ts&play_token=mgA8BOURpe
-#EXTINF:-1 tvg-name="UK| ITV1 HEVC HD" group-title="ITV1",(Server 8 RO) UK| ITV1 HEVC HD
-http://sport-birutv.my.id:80/play/live.php?mac=00:1A:79:6E:5C:0E&stream=&extension=ts&play_token=PMBYkCKn0d
-#EXTINF:-1 tvg-name="UK| ITV1 HEVC FHD" group-title="ITV1",(Server 8 RO) UK| ITV1 HEVC FHD
-http://sport-birutv.my.id:80/play/live.php?mac=00:1A:79:6E:5C:0E&stream=&extension=ts&play_token=ZIsAPrzupE
 #EXTINF:-1 tvg-name="UK| ITV 1 HEVC" group-title="ITV 1",(Server 5 RO) UK| ITV 1 HEVC
-http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:B5:D0:90&stream=&extension=ts&play_token=W511vnmHs5
-#EXTINF:-1 tvg-name="┃UK┃ ITV 1 HEVC HD" group-title="ITV 1",(Server 2 RO) ┃UK┃ ITV 1 HEVC HD
-http://line.cloud-ott.net:80/play/live.php?mac=00:1A:79:AE:64:AC&stream=&extension=ts&play_token=k3dUZGL4v0
-#EXTINF:-1 tvg-name="┃UK┃ ITV 1 HEVC FHD" group-title="ITV 1",(Server 2 RO) ┃UK┃ ITV 1 HEVC FHD
-http://line.cloud-ott.net:80/play/live.php?mac=00:1A:79:AE:64:AC&stream=&extension=ts&play_token=flyYph1ayq
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://mag.trexlive.me:8000/c/
+http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:D6:E8:3E&stream=&extension=ts&play_token=6nTEc5qzX7|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fmag.trexlive.me%3A8000/c/
 #EXTINF:-1 tvg-name="UK| ITV1 HEVC FHD" group-title="ITV1",(Server 5 RO) UK| ITV1 HEVC FHD
-http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:B5:D0:90&stream=&extension=ts&play_token=Xq7VWsedwR
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://mag.trexlive.me:8000/c/
+http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:D6:E8:3E&stream=&extension=ts&play_token=Ur8P7Y6nci|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fmag.trexlive.me%3A8000/c/
 #EXTINF:-1 tvg-name="UK| ITV1 HEVC HD" group-title="ITV1",(Server 5 RO) UK| ITV1 HEVC HD
-http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:B5:D0:90&stream=&extension=ts&play_token=hCWV3spgEC
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://mag.trexlive.me:8000/c/
+http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:D6:E8:3E&stream=&extension=ts&play_token=ydHVgujrcE|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fmag.trexlive.me%3A8000/c/
+#EXTINF:-1 tvg-name="┃UK┃ ITV 1 HEVC HD" group-title="ITV 1",(Server 2 RO) ┃UK┃ ITV 1 HEVC HD
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://line.cloud-ott.net:80/c/
+http://line.cloud-ott.net:80/play/live.php?mac=00:1A:79:AE:64:AC&stream=&extension=ts&play_token=esuEnSZbiu|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fline.cloud-ott.net%3A80/c/
+#EXTINF:-1 tvg-name="┃UK┃ ITV 1 HEVC FHD" group-title="ITV 1",(Server 2 RO) ┃UK┃ ITV 1 HEVC FHD
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3
+#EXTVLCOPT:http-referrer=http://line.cloud-ott.net:80/c/
+http://line.cloud-ott.net:80/play/live.php?mac=00:1A:79:AE:64:AC&stream=&extension=ts&play_token=RbChHCAJi3|User-Agent=Mozilla%2F5.0+%28QtEmbedded%3B+U%3B+Linux%3B+C%29+AppleWebKit%2F533.3+%28KHTML%2C+like+Gecko%29+MAG200+stbapp+ver%3A+2+rev%3A+250+Safari%2F533.3&Referer=http%3A%2F%2Fline.cloud-ott.net%3A80/c/
