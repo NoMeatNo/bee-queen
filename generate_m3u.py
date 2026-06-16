@@ -56,7 +56,7 @@ def handshake(portal_url, mac):
     headers, cookies = build_auth_headers_and_cookies(portal_url, mac, "")
     try:
         url = f"{portal_url}/server/load.php?type=stb&action=handshake&token=&Vs=1&vc=1"
-        response = requests.get(url, headers=headers, cookies=cookies, timeout=10, verify=False)
+        response = requests.get(url, headers=headers, cookies=cookies, timeout=5, verify=False)
         data = response.json()
         token = data.get("js", {}).get("token")
         random_value = data.get("js", {}).get("random", "0")
@@ -66,7 +66,7 @@ def handshake(portal_url, mac):
             # Activate session
             headers, cookies = build_auth_headers_and_cookies(portal_url, mac, token, random_value)
             profile_url = f"{portal_url}/server/load.php?type=stb&action=get_profile"
-            requests.get(profile_url, headers=headers, cookies=cookies, timeout=10, verify=False)
+            requests.get(profile_url, headers=headers, cookies=cookies, timeout=5, verify=False)
 
             return token, random_value
     except Exception as e:
@@ -77,7 +77,7 @@ def fetch_channels(portal_url, mac, token, random_value):
     headers, cookies = build_auth_headers_and_cookies(portal_url, mac, token, random_value)
     url = f"{portal_url}/server/load.php?type=itv&action=get_all_channels"
     try:
-        response = requests.get(url, headers=headers, cookies=cookies, timeout=10, verify=False)
+        response = requests.get(url, headers=headers, cookies=cookies, timeout=5, verify=False)
         data = response.json()
         if "js" in data and isinstance(data["js"], dict) and "data" in data["js"]:
             return data["js"]["data"]
@@ -89,7 +89,7 @@ def get_channel_link(portal_url, mac, token, random_value, cmd):
     headers, cookies = build_auth_headers_and_cookies(portal_url, mac, token, random_value)
     url = f"{portal_url}/server/load.php?type=itv&action=create_link&cmd={quote_plus(cmd)}"
     try:
-        response = requests.get(url, headers=headers, cookies=cookies, timeout=10, verify=False)
+        response = requests.get(url, headers=headers, cookies=cookies, timeout=5, verify=False)
         data = response.json()
         if "js" in data and isinstance(data["js"], dict) and "cmd" in data["js"]:
             return data["js"]["cmd"]
@@ -108,10 +108,11 @@ def main():
 
     for server in config.get("servers", []):
         portal_url = server.get("portal_url")
+        server_name = server.get("name", "Unknown Server")
         if not portal_url:
             continue
 
-        print(f"--- Processing {server.get('name')} ({portal_url}) ---")
+        print(f"--- Processing {server_name} ({portal_url}) ---")
         token = None
         random_value = None
         working_mac = None
@@ -147,7 +148,8 @@ def main():
                             "mac": working_mac,
                             "token": token,
                             "random": random_value,
-                            "cmd": cmd
+                            "cmd": cmd,
+                            "server_name": server_name
                         })
                     break
 
@@ -160,9 +162,10 @@ def main():
                 # Resolve link if it starts with ffmpeg or http
                 if link.startswith("ffmpeg "):
                     link = link.split(" ")[1]
-                f.write(f'#EXTINF:-1 tvg-name="{ch["name"]}" group-title="{ch["target"]}",{ch["name"]}\n')
+                formatted_name = f'({ch["server_name"]}) {ch["name"]}'
+                f.write(f'#EXTINF:-1 tvg-name="{ch["name"]}" group-title="{ch["target"]}",{formatted_name}\n')
                 f.write(f'{link}\n')
-                print(f"Added: {ch['name']}")
+                print(f"Added: {formatted_name}")
             else:
                 print(f"Failed to resolve link for: {ch['name']}")
 
