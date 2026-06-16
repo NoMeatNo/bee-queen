@@ -92,8 +92,20 @@ def _extract_play_token(returned_cmd):
 def get_channel_link(ch):
     headers, cookies = build_auth_headers_and_cookies(ch["portal"], ch["mac"], ch["token"], ch["random"])
 
+    # Check if stream ID is passed explicitly in ch dictionary
+    stream_id = ch.get("id") or ch.get("stream_id")
+
+    if not stream_id:
+        cmd_val = str(ch.get("cmd", ""))
+        m = re.search(r'(?:/|^|ch/|cmd=)([0-9]+)(?:_.*)?$', cmd_val)
+        if m:
+            stream_id = m.group(1)
+        else:
+            m2 = re.search(r"(\d+)", cmd_val)
+            stream_id = m2.group(1) if m2 else cmd_val
+
     # Try the same strategy the Kodi addon uses
-    create_link_url = f"{ch['portal']}/portal.php?type=itv&action=create_link&cmd={quote_plus(ch['cmd'])}&JsHttpRequest=1-xml"
+    create_link_url = f"{ch['portal']}/portal.php?type=itv&action=create_link&cmd={quote_plus(str(ch['cmd']))}&JsHttpRequest=1-xml"
     try:
         response = requests.get(create_link_url, headers=headers, cookies=cookies, timeout=FETCH_TIMEOUT, verify=False)
         data = response.json()
@@ -107,8 +119,6 @@ def get_channel_link(ch):
             # Otherwise extract play_token to build the direct live.php link like Kodi does
             play_token = _extract_play_token(returned_cmd)
             if play_token:
-                stream_id_match = re.search(r"(\d+)", ch["cmd"])
-                stream_id = stream_id_match.group(1) if stream_id_match else ch["cmd"]
                 final_url = f"{ch['portal'].rstrip('/')}/play/live.php?mac={ch['mac']}&stream={stream_id}&extension=ts&play_token={play_token}"
                 return ch, final_url
     except Exception:
@@ -175,6 +185,8 @@ def process_server(server):
                         "token": token,
                         "random": random_value,
                         "cmd": cmd,
+                        "id": ch.get("id"),
+                        "stream_id": ch.get("stream_id"),
                         "server_name": server_name
                     })
                 break
