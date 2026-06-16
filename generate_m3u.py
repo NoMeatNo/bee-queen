@@ -3,7 +3,7 @@ import hashlib
 import requests
 import re
 import concurrent.futures
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlparse
 import urllib3
 import sys
 
@@ -16,8 +16,8 @@ TARGET_CHANNELS = ["ITV 1", "ITV1"]
 QUALITY_FILTER = "hevc"
 
 # Handshake timeout and attempts config
-HANDSHAKE_TIMEOUT = 3.0
-FETCH_TIMEOUT = 5.0
+HANDSHAKE_TIMEOUT = 5.0
+FETCH_TIMEOUT = 10.0
 MAX_MAC_ATTEMPTS = 5
 USER_AGENT = "Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3"
 
@@ -30,25 +30,33 @@ def build_device_identity(mac):
     serialnumber = hashlib.md5(mac_upper.encode()).hexdigest().upper()
     device_id2 = hashlib.sha256(mac_upper.encode()).hexdigest().upper()
     hw_version_2 = hashlib.sha1(mac_upper.encode()).hexdigest()
-    return serialnumber, device_id2, hw_version_2
+
+    adid = hashlib.md5((device_id2 + mac_upper).encode()).hexdigest()
+    return {"sn": serialnumber, "device_id": serialnumber, "device_id2": device_id2, "adid": adid}
 
 def build_auth_headers_and_cookies(portal_url, mac, token, random_value="0"):
     mac_upper = (mac or "").strip().upper()
     identity = build_device_identity(mac_upper)
+    parsed = urlparse(portal_url)
+
     headers = {
         "User-Agent": USER_AGENT,
         "Accept": "*/*",
         "X-User-Agent": "Model: MAG250; Link:",
         "Referer": f"{portal_url}/c/",
+        "Host": parsed.netloc,
         "Authorization": f"Bearer {token}" if token else "",
     }
+
     cookies = {
         "mac": mac_upper,
         "stb_lang": "en",
         "timezone": "Europe/Bucharest",
-        "device_id": identity[0],
-        "device_id2": identity[1],
-        "hw_version_2": identity[2],
+        "sn": identity["sn"],
+        "device_id": identity["device_id"],
+        "device_id2": identity["device_id2"],
+        "adid": identity["adid"],
+        "hw_version": "1.7-BD-00",
     }
     if random_value:
         cookies["random"] = random_value
@@ -56,31 +64,41 @@ def build_auth_headers_and_cookies(portal_url, mac, token, random_value="0"):
 
 def handshake(portal_url, mac):
     headers, cookies = build_auth_headers_and_cookies(portal_url, mac, "")
+
+    url = f"{portal_url.rstrip('/')}/portal.php?type=stb&action=handshake&JsHttpRequest=1-xml"
+    params = {"token": ""}
+
     try:
-        url = f"{portal_url}/server/load.php?type=stb&action=handshake&token=&Vs=1&vc=1"
-        response = requests.get(url, headers=headers, cookies=cookies, timeout=HANDSHAKE_TIMEOUT, verify=False)
+        response = requests.get(url, headers=headers, cookies=cookies, params=params, timeout=HANDSHAKE_TIMEOUT, verify=False)
         data = response.json()
         token = data.get("js", {}).get("token")
         random_value = data.get("js", {}).get("random", "0")
+
         if token:
             headers, cookies = build_auth_headers_and_cookies(portal_url, mac, token, random_value)
-            profile_url = f"{portal_url}/server/load.php?type=stb&action=get_profile"
+            profile_url = f"{portal_url.rstrip('/')}/portal.php?type=stb&action=get_profile&JsHttpRequest=1-xml"
             requests.get(profile_url, headers=headers, cookies=cookies, timeout=HANDSHAKE_TIMEOUT, verify=False)
             return token, random_value
     except Exception:
         pass
+
     return None, None
 
 def fetch_channels(portal_url, mac, token, random_value):
     headers, cookies = build_auth_headers_and_cookies(portal_url, mac, token, random_value)
-    url = f"{portal_url}/server/load.php?type=itv&action=get_all_channels"
-    try:
-        response = requests.get(url, headers=headers, cookies=cookies, timeout=FETCH_TIMEOUT, verify=False)
-        data = response.json()
-        if "js" in data and isinstance(data["js"], dict) and "data" in data["js"]:
-            return data["js"]["data"]
-    except Exception as e:
-        print(f"Error fetching channels for {portal_url}: {e}")
+
+    urls_to_try = [
+        f"{portal_url}/server/load.php?type=itv&action=get_all_channels",
+        f"{portal_url}/portal.php?type=itv&action=get_all_channels&JsHttpRequest=1-xml"
+    ]
+    for url in urls_to_try:
+        try:
+            response = requests.get(url, headers=headers, cookies=cookies, timeout=FETCH_TIMEOUT, verify=False)
+            data = response.json()
+            if "js" in data and isinstance(data["js"], dict) and "data" in data["js"]:
+                return data["js"]["data"]
+        except Exception:
+            continue
     return []
 
 def _extract_play_token(returned_cmd):
@@ -89,41 +107,91 @@ def _extract_play_token(returned_cmd):
         return play_token_match.group(1)
     return None
 
+def extract_stream_id(ch):
+    cmd_val = str(ch.get("cmd", ""))
+
+    m = re.search(r"stream=(\d+)", cmd_val)
+    if m: return m.group(1)
+
+    if ch.get("id"): return str(ch["id"])
+    if ch.get("stream_id"): return str(ch["stream_id"])
+
+    m2 = re.search(r'(?:/|^|ch/|cmd=)([0-9]+)(?:_.*)?$', cmd_val)
+    if m2: return m2.group(1)
+
+    m3 = re.search(r"(\d+)", cmd_val)
+    return m3.group(1) if m3 else cmd_val
+
 def get_channel_link(ch):
     headers, cookies = build_auth_headers_and_cookies(ch["portal"], ch["mac"], ch["token"], ch["random"])
 
-    # Check if stream ID is passed explicitly in ch dictionary
-    stream_id = ch.get("id") or ch.get("stream_id")
+    # We send EXACTLY the cmd or id to create_link like Kodi does
+    cmd_val = ch.get("cmd") or ch.get("id") or ch.get("stream_id")
 
-    if not stream_id:
-        cmd_val = str(ch.get("cmd", ""))
-        m = re.search(r'(?:/|^|ch/|cmd=)([0-9]+)(?:_.*)?$', cmd_val)
-        if m:
-            stream_id = m.group(1)
-        else:
-            m2 = re.search(r"(\d+)", cmd_val)
-            stream_id = m2.group(1) if m2 else cmd_val
+    urls_to_try = [
+        f"{ch['portal'].rstrip('/')}/server/load.php?type=itv&action=create_link&cmd={quote_plus(str(cmd_val))}",
+        f"{ch['portal'].rstrip('/')}/portal.php?type=itv&action=create_link&cmd={quote_plus(str(cmd_val))}&JsHttpRequest=1-xml"
+    ]
 
-    # Try the same strategy the Kodi addon uses
-    create_link_url = f"{ch['portal']}/portal.php?type=itv&action=create_link&cmd={quote_plus(str(ch['cmd']))}&JsHttpRequest=1-xml"
+    for create_link_url in urls_to_try:
+        try:
+            response = requests.get(create_link_url, headers=headers, cookies=cookies, timeout=FETCH_TIMEOUT, verify=False)
+            data = response.json()
+            if "js" in data and isinstance(data["js"], dict) and "cmd" in data["js"]:
+                returned_cmd = data["js"]["cmd"]
+
+                if returned_cmd:
+                    if returned_cmd.startswith("http"):
+                        fixed_url = returned_cmd
+                        if "&stream=&" in fixed_url:
+                            final_stream_id = extract_stream_id(ch)
+                            fixed_url = fixed_url.replace("&stream=&", f"&stream={final_stream_id}&")
+
+                        try:
+                            probe_response = requests.get(fixed_url, headers=headers, stream=True, timeout=5.0, verify=False, allow_redirects=True)
+                            if probe_response.url and probe_response.status_code < 400:
+                                return ch, probe_response.url
+                        except Exception:
+                            pass
+                        return ch, fixed_url
+
+                    if returned_cmd.startswith("ffmpeg "):
+                        if "http" in returned_cmd:
+                            return ch, returned_cmd.split("ffmpeg ")[1].strip()
+                        return ch, returned_cmd
+
+                play_token = _extract_play_token(returned_cmd)
+                if play_token:
+                    final_stream_id = extract_stream_id(ch)
+                    initial_url = f"{ch['portal'].rstrip('/')}/play/live.php?mac={ch['mac']}&stream={final_stream_id}&extension=ts&play_token={play_token}"
+
+                    try:
+                        probe_headers = headers.copy()
+                        probe_headers.update({
+                            "Accept-Encoding": "identity",
+                            "Connection": "close"
+                        })
+                        probe_response = requests.get(initial_url, headers=probe_headers, stream=True, timeout=5.0, verify=False, allow_redirects=True)
+                        if probe_response.url and probe_response.status_code < 400:
+                            return ch, probe_response.url
+                    except Exception:
+                        pass
+
+                    return ch, initial_url
+
+        except Exception:
+            pass
+
+    final_stream_id = extract_stream_id(ch)
+    fallback_url = f"{ch['portal'].rstrip('/')}/play/live.php?mac={ch['mac']}&stream={final_stream_id}&extension=ts"
     try:
-        response = requests.get(create_link_url, headers=headers, cookies=cookies, timeout=FETCH_TIMEOUT, verify=False)
-        data = response.json()
-        if "js" in data and isinstance(data["js"], dict) and "cmd" in data["js"]:
-            returned_cmd = data["js"]["cmd"]
-
-            # If server returned ffmpeg standard stream line, return it
-            if returned_cmd and returned_cmd.startswith("ffmpeg "):
-                return ch, returned_cmd
-
-            # Otherwise extract play_token to build the direct live.php link like Kodi does
-            play_token = _extract_play_token(returned_cmd)
-            if play_token:
-                final_url = f"{ch['portal'].rstrip('/')}/play/live.php?mac={ch['mac']}&stream={stream_id}&extension=ts&play_token={play_token}"
-                return ch, final_url
+        probe_response = requests.get(fallback_url, headers=headers, stream=True, timeout=5.0, verify=False, allow_redirects=True)
+        if probe_response.url and probe_response.status_code < 400:
+            return ch, probe_response.url
     except Exception:
         pass
-    return ch, None
+
+    return ch, fallback_url
 
 def normalize_name(name):
     name = re.sub(r'\[.*?\]', '', name)
