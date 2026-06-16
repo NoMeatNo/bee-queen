@@ -31,3 +31,4 @@ jobs:
           file_pattern: "hublive.m3u"
           branch: "generated-m3u"
           create_branch: true
+          push_options: '--force'
