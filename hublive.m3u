@@ -1,0 +1,17 @@
+#EXTM3U
+#EXTINF:-1 tvg-name="UK| ITV 1 HEVC" group-title="ITV 1",(Server 8 RO) UK| ITV 1 HEVC
+http://sport-birutv.my.id:80/play/live.php?mac=00:1A:79:6E:5C:0E&stream=&extension=ts&play_token=mgA8BOURpe
+#EXTINF:-1 tvg-name="UK| ITV1 HEVC HD" group-title="ITV1",(Server 8 RO) UK| ITV1 HEVC HD
+http://sport-birutv.my.id:80/play/live.php?mac=00:1A:79:6E:5C:0E&stream=&extension=ts&play_token=PMBYkCKn0d
+#EXTINF:-1 tvg-name="UK| ITV1 HEVC FHD" group-title="ITV1",(Server 8 RO) UK| ITV1 HEVC FHD
+http://sport-birutv.my.id:80/play/live.php?mac=00:1A:79:6E:5C:0E&stream=&extension=ts&play_token=ZIsAPrzupE
+#EXTINF:-1 tvg-name="UK| ITV 1 HEVC" group-title="ITV 1",(Server 5 RO) UK| ITV 1 HEVC
+http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:B5:D0:90&stream=&extension=ts&play_token=W511vnmHs5
+#EXTINF:-1 tvg-name="┃UK┃ ITV 1 HEVC HD" group-title="ITV 1",(Server 2 RO) ┃UK┃ ITV 1 HEVC HD
+http://line.cloud-ott.net:80/play/live.php?mac=00:1A:79:AE:64:AC&stream=&extension=ts&play_token=k3dUZGL4v0
+#EXTINF:-1 tvg-name="┃UK┃ ITV 1 HEVC FHD" group-title="ITV 1",(Server 2 RO) ┃UK┃ ITV 1 HEVC FHD
+http://line.cloud-ott.net:80/play/live.php?mac=00:1A:79:AE:64:AC&stream=&extension=ts&play_token=flyYph1ayq
+#EXTINF:-1 tvg-name="UK| ITV1 HEVC FHD" group-title="ITV1",(Server 5 RO) UK| ITV1 HEVC FHD
+http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:B5:D0:90&stream=&extension=ts&play_token=Xq7VWsedwR
+#EXTINF:-1 tvg-name="UK| ITV1 HEVC HD" group-title="ITV1",(Server 5 RO) UK| ITV1 HEVC HD
+http://mag.trexlive.me:80/play/live.php?mac=00:1A:79:B5:D0:90&stream=&extension=ts&play_token=hCWV3spgEC
